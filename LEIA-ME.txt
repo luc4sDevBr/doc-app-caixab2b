@@ -1,0 +1,21 @@
+DOCUMENTAÇÃO DA API DE INTEGRAÇÃO COMERCIAL - CAIXA B2B (Rhyla 1.0.8)
+Material para clientes: descreve só como usar a API (sem detalhes internos).
+
+Requisito: Node.js 18 ou mais novo.
+
+1) Nesta pasta, instale uma vez:     npm install
+2) Prévia com recarga:                npm run dev      -> http://localhost:3333
+3) Gerar o site estático:             npm run build    -> pasta dist\
+
+Onde editar:
+- rhyla-docs\body\*.md     páginas (uma por endpoint: post-<rota>.md)
+- rhyla-docs\config.json   título e menu lateral (grupos Começo / Endpoints / Referência)
+- rhyla-docs\styles\       cores do projeto (laranja #FF8000 / texto #CC6600) nos temas claro e escuro
+- rhyla-docs\public\       logo e ícone
+
+A pasta dist\ já vem gerada: pode publicar direto no IIS (site estático).
+Não coloque senha, token ou string de conexão nas páginas.
+- rhyla-docs\public\API_Integracao_Comercial_CaixaB2B.postman_collection.json
+    coleção do Postman para os clientes (baixada pelo botão da página "Testes no Postman").
+    Se mudar a coleção interna (WebApi\Docs\WebApi_CaixaB2B.postman_collection.json), atualize esta também.
+- Rodapé: definido em rhyla-docs\styles\global.css (.rhyla-footer p::after).

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>API de Integração Comercial</title>
+  <!-- CSS fixo: global.css (sempre necessário) + tema padrão light.css -->
+  <link rel="stylesheet" href="/styles/global.css">
+  <link id="theme-style" rel="stylesheet" href="/styles/light.css">
+  <link rel="stylesheet" href="/styles/page-generator.css">
+  <meta name="rhyla-lang" content="pt-br">
+  <link rel="icon" type="image/x-icon" href="/public/favicon.ico">
+  <!-- Script crítico que corrige os caminhos CSS antes da página renderizar completamente -->
+  <script>
+    (function () {
+      // Função de inicialização imediata para corrigir caminhos CSS antes de qualquer renderização
+      function fixCssUrls() {
+        try {
+          // 1. Detecta o prefixo base
+          var metaBase = document.querySelector('meta[name="rhyla-base"]');
+          var prefix = '/';
+          if (metaBase && metaBase.getAttribute('content')) {
+            prefix = metaBase.getAttribute('content');
+            if (!prefix.endsWith('/')) prefix += '/';
+          }
+          
+          // 2. Corrige imediatamente os links CSS
+          var globalCss = document.querySelector('link[href$="/styles/global.css"]');
+          var themeCss = document.getElementById('theme-style');
+          
+          if (globalCss) {
+            globalCss.href = prefix + 'styles/global.css';
+          }
+          
+          if (themeCss) {
+            var saved = localStorage.getItem('rhyla-theme') || 'light';
+            themeCss.href = prefix + 'styles/' + (saved === 'dark' ? 'dark' : 'light') + '.css';
+          }
+          
+          // 3. Armazena o prefixo para outros scripts
+          window.__rhyla_prefix__ = prefix;
+        } catch (e) {
+          console.error('Erro ao ajustar caminhos CSS:', e);
+        }
+      }
+      
+      // Executa imediatamente para evitar FOUC (flash of unstyled content)
+      fixCssUrls();
+    })();
+  </script>
+</head>
+
+<body>
+  <header class="rhyla-header">
+    <div class="rhyla-brand">
+      <!-- Logo com caminho absoluto baseado no PREFIX -->
+      <img id="rhyla-logo" src="/public/logo-unico.png" alt="API de Integração Comercial" style="height:48px;width:auto;" >
+      <div class="rh-brand-texto"><span class="rh-brand-titulo">API de Integração Comercial</span><span class="rh-brand-sub">Caixa B2B · Focare</span></div>
+      <script>
+        (function() {
+          try {
+            var logo = document.getElementById('rhyla-logo');
+            var metaBase = document.querySelector('meta[name="rhyla-base"]');
+            var prefix = '/';
+            if (metaBase && metaBase.getAttribute('content')) {
+              prefix = metaBase.getAttribute('content');
+              if (!prefix.endsWith('/')) prefix += '/';
+            }
+            logo.setAttribute('data-src', prefix + 'public/logo-unico.png');
+          } catch(e) {}
+        })();
+      </script>
+    </div>
+    <div class="rhyla-actions">
+      <button id="search-open" class="theme-switch" aria-label="Abrir busca">🔎 Buscar</button>
+      <button id="theme-toggle" class="theme-switch" aria-label="Alternar tema">🌙 Dark</button>
+    </div>
+  </header>
+
+  <!-- Overlay de Busca (global) -->
+  <div id="search-overlay" class="rh-search-overlay" aria-hidden="true">
+    <div class="rh-search-backdrop" data-close-overlay></div>
+    <div class="rh-search-panel" role="dialog" aria-modal="true" aria-labelledby="search-input">
+      <div class="rh-search-input-wrap">
+        <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input id="search-input" type="text" placeholder="Buscar na documentação..." autocomplete="off" />
+        <button id="search-close" class="rh-search-close" aria-label="Fechar">✕</button>
+      </div>
+      <div class="rh-search-meta" id="search-meta">Carregando índice…</div>
+      <div class="rh-search-results" id="search-results" role="list"></div>
+    </div>
+  </div>
+
+  <script>
+    /* Caixa B2B: o "rhyla dev" não renderiza HTML dentro do .md (só o build). As páginas usam Markdown puro e este
+       script aplica o visual: **POST** no início do parágrafo vira etiqueta; link .postman_collection.json vira botão de download. */
+    (function () {
+      function aplica() {
+        var main = document.querySelector('.rhyla-main') || document.querySelector('main') || document.body;
+        main.querySelectorAll('p > strong:first-child').forEach(function (el) {
+          var t = (el.textContent || '').trim().toUpperCase();
+          if (/^(GET|POST|PUT|PATCH|DELETE)$/.test(t) && !el.classList.contains('http-tag')) {
+            el.classList.add('http-tag', 'http-tag--' + t.toLowerCase());
+          }
+        });
+        main.querySelectorAll('a[href$=".postman_collection.json"]').forEach(function (a) {
+          if (!a.classList.contains('rh-download')) {
+            a.classList.add('rh-download');
+            a.setAttribute('download', '');
+          }
+        });
+      }
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', aplica); else aplica();
+      new MutationObserver(function () { aplica(); }).observe(document.documentElement, { childList: true, subtree: true });
+    })();
+  </script>
+  <script>
+    (function() {
+      // Função para carregar scripts com o prefixo correto
+      function loadScript(src, async) {
+        try {
+          var prefix = window.__rhyla_prefix__ || '/';
+          var scriptElement = document.createElement('script');
+          scriptElement.src = prefix + src.replace(/^\//g, '');
+          if (async) scriptElement.async = true;
+          document.body.appendChild(scriptElement);
+        } catch (e) {
+          console.error('Erro ao carregar script:', src, e);
+        }
+      }
+      
+      // Carregar scripts essenciais com o prefixo correto
+      loadScript('scripts/header-runtime.js');
+      loadScript('scripts/search-runtime.js');
+      loadScript('scripts/password-auth.js');
+    })();
+  </script>

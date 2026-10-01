@@ -1,0 +1,43 @@
+{
+  "title": "API de Integração Comercial",
+  "description": "Documentação da API de Integração Comercial Caixa B2B (Focare)",
+  "site_url": "",
+  "side_topics": true,
+  "allow_raw_html": true,
+  "base": "/",
+  "password_doc": {
+    "enabled": false,
+    "passwords": []
+  },
+  "build_ignore": [
+    "kit_dev_rhyla"
+  ],
+  "sidebar": [
+    "home",
+    {
+      "title": "Começo",
+      "children": [
+        "como_autenticar",
+        "testes_no_postman"
+      ]
+    },
+    {
+      "title": "Endpoints",
+      "children": [
+        "post-autenticacao",
+        "post-addleadfocare",
+        "post-consultacliente",
+        "post-atualizacliente",
+        "post-tabularlead"
+      ]
+    },
+    {
+      "title": "Referência",
+      "children": [
+        "campos_do_cliente",
+        "codigos_de_retorno",
+        "historico"
+      ]
+    }
+  ]
+}

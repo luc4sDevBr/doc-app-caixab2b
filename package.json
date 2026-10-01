@@ -1,0 +1,13 @@
+{
+  "name": "documentacao-api-caixab2b",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Documentação da API de Integração Comercial Caixa B2B (Rhyla)",
+  "scripts": {
+    "dev": "rhyla dev",
+    "build": "rhyla build"
+  },
+  "devDependencies": {
+    "rhyla": "1.0.8"
+  }
+}
