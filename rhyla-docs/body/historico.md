@@ -1,7 +1,13 @@
 # Histórico
 
+## 02/10/2026
+
+- Endereço base da API: **`https://focare-techia.actionline.com.br:30454`**. A coleção do Postman já vem com ele preenchido.
+- Novo endpoint [`addclientedireto`](./post-addclientedireto.html): inclui um cliente que já está em conversa por WhatsApp direto, ConnectaCX ou TechIA (`origem`), sem enviar mensagem automática.
+
 ## 01/10/2026
 
+- Os endereços passam a ter o prefixo **`/api/interface/caixab2b/`** (ex.: `/api/interface/caixab2b/autenticacao`). Os endereços antigos `/api/interface/...` deixam de responder para a Caixa B2B.
 - O bloqueio de tabulação repetida no [`tabularlead`](./post-tabularlead.html) passa de 30 para **5 minutos**.
 
 ## 30/09/2026

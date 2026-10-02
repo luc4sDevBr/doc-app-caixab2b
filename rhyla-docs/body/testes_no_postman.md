@@ -11,7 +11,7 @@ A coleção do Postman tem uma chamada pronta para cada endpoint, já com testes
 
 | Variável | O que colocar |
 |---|---|
-| `baseUrl` | Endereço base informado pela Focare |
+| `baseUrl` | Já vem preenchido com `https://focare-techia.actionline.com.br:30454` |
 | `login` / `senha` | Usuário e senha de integração |
 | `telefoneTeste` | Um número da sua equipe: o envio de lead gera um WhatsApp real |
 | `codtabulacao` / `codtabulacao2` | Dois códigos de tabulação diferentes informados pela Focare |

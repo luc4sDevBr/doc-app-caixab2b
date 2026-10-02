@@ -26,6 +26,7 @@
       "children": [
         "post-autenticacao",
         "post-addleadfocare",
+        "post-addclientedireto",
         "post-consultacliente",
         "post-atualizacliente",
         "post-tabularlead"

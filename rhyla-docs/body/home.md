@@ -1,10 +1,10 @@
 # API de Integração Comercial
 
-API da **Focare** para a integração comercial da operação **Caixa B2B**. Com ela, sua empresa envia leads, consulta e atualiza os dados dos clientes e registra tabulações de atendimento.
+API da **Focare** para a integração comercial da operação **Caixa B2B**. Com ela, sua empresa envia leads, inclui clientes que já estão em conversa, consulta e atualiza os dados dos clientes e registra tabulações de atendimento.
 
 | Item | Valor |
 |---|---|
-| **Endereço base** | `{BASE_URL}`, informado pela Focare na liberação do acesso |
+| **Endereço base** | `https://focare-techia.actionline.com.br:30454` |
 | **Formato** | JSON (UTF-8), todas as rotas usam `POST` |
 | **Autenticação** | Token Bearer, válido por 8 horas |
 
@@ -14,11 +14,12 @@ API da **Focare** para a integração comercial da operação **Caixa B2B**. Com
 
 | Rota | Token | Para quê |
 |---|---|---|
-| [`/api/interface/autenticacao`](./post-autenticacao.html) | não | Gera o token de acesso |
-| [`/api/interface/addleadfocare`](./post-addleadfocare.html) | sim | Envia um novo lead |
-| [`/api/interface/consultacliente`](./post-consultacliente.html) | sim | Consulta um cliente por código, CPF ou CNPJ |
-| [`/api/interface/atualizacliente`](./post-atualizacliente.html) | sim | Atualiza os dados de um cliente |
-| [`/api/interface/tabularlead`](./post-tabularlead.html) | sim | Registra uma tabulação de atendimento |
+| [`/api/interface/caixab2b/autenticacao`](./post-autenticacao.html) | não | Gera o token de acesso |
+| [`/api/interface/caixab2b/addleadfocare`](./post-addleadfocare.html) | sim | Envia um novo lead |
+| [`/api/interface/caixab2b/addclientedireto`](./post-addclientedireto.html) | sim | Inclui um cliente que já está em conversa por um canal direto, sem mensagem automática |
+| [`/api/interface/caixab2b/consultacliente`](./post-consultacliente.html) | sim | Consulta um cliente por código, CPF ou CNPJ |
+| [`/api/interface/caixab2b/atualizacliente`](./post-atualizacliente.html) | sim | Atualiza os dados de um cliente |
+| [`/api/interface/caixab2b/tabularlead`](./post-tabularlead.html) | sim | Registra uma tabulação de atendimento |
 
 ## Primeiros passos
 

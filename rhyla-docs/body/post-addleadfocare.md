@@ -1,6 +1,6 @@
 # addleadfocare
 
-**POST** `/api/interface/addleadfocare` · Bearer
+**POST** `/api/interface/caixab2b/addleadfocare` · Bearer
 
 Envia um novo lead para a operação. Quando o lead é aceito, a empresa recebe o primeiro contato por WhatsApp no `telefone` informado e segue no atendimento comercial.
 

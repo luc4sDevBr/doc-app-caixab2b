@@ -1,6 +1,6 @@
 # consultacliente
 
-**POST** `/api/interface/consultacliente` · Bearer
+**POST** `/api/interface/caixab2b/consultacliente` · Bearer
 
 Consulta clientes por `codprospect`, `cpf` ou `cnpj`. Informe pelo menos um. Se enviar mais de um, o cliente precisa atender a todos.
 

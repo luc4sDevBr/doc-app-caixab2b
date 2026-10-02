@@ -1,6 +1,6 @@
 # tabularlead
 
-**POST** `/api/interface/tabularlead` · Bearer
+**POST** `/api/interface/caixab2b/tabularlead` · Bearer
 
 Registra o resultado de um atendimento feito pela sua equipe ou pelo seu sistema (por exemplo "sem interesse" ou "retornar depois"). Os códigos de tabulação válidos são informados pela Focare.
 

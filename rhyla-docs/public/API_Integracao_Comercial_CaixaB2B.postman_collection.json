@@ -1,1527 +1,1882 @@
 {
-  "info": {
-    "name": "API de Integração Comercial - Caixa B2B",
-    "_postman_id": "a1b2c3d4-0930-4c41-9ab2-integracaocx",
-    "description": "Chamadas e testes automáticos da API de Integração Comercial Caixa B2B (Focare).\n\nComo usar:\n1. Em Variables, preencha baseUrl (endereço informado pela Focare), login e senha de integração, telefoneTeste (um número da sua equipe: o envio de lead gera um WhatsApp real), codtabulacao e codtabulacao2 (dois códigos de tabulação diferentes informados pela Focare) e atendente (nome de um atendente cadastrado).\n2. Rode a coleção inteira em ordem (Run collection). O token, o documento de teste e o codprospect são preenchidos automaticamente.\n\nCada execução cria um cliente de teste: combine com a Focare o ambiente antes de rodar.",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
-  "item": [
-    {
-      "name": "1 - Autenticação",
-      "item": [
-        {
-          "name": "01 Autenticação - OK",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"login\": \"{{login}}\",\n  \"senha\": \"{{senha}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/autenticacao",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "autenticacao"
-              ]
-            },
-            "description": "Guarda o token na variável {{token}} usada pelos outros testes."
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 200\", () => pm.response.to.have.status(200));",
-                  "const t = pm.response.json();",
-                  "pm.test(\"devolve o token (string)\", () => pm.expect(t).to.be.a(\"string\").and.not.empty);",
-                  "pm.collectionVariables.set(\"token\", t);"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "02 Autenticação - senha errada",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"login\": \"{{login}}\",\n  \"senha\": \"senha-errada-teste\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/autenticacao",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "autenticacao"
-              ]
-            },
-            "description": ""
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 400\", () => pm.response.to.have.status(400));"
-                ]
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "2 - addleadfocare",
-      "item": [
-        {
-          "name": "03 addleadfocare - OK (envia WhatsApp real)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"data_cadastro\": \"{{dataCadastro}}\",\n  \"produto\": \"CARTAO_BENEFICIO\",\n  \"tp_cliente\": \"PJ\",\n  \"qtde_func\": \"50\",\n  \"perfil_mailing\": \"{{cnpjPerfil}}\",\n  \"cpf\": \"{{cpfTeste}}\",\n  \"nome\": \"Empresa Teste Postman LTDA\",\n  \"nome_fantasia\": \"Teste Postman\",\n  \"dt_abertura\": \"2010-05-20\",\n  \"cnae\": \"João da Silva (decisor)\",\n  \"desc_cnae\": \"(11) 97777-6666\",\n  \"sr\": \"Diretor financeiro\",\n  \"sev\": \"Frota própria\",\n  \"agencia\": \"1234\",\n  \"id_agencia\": \"5678\",\n  \"operacao\": \"Planilha manual\",\n  \"telefone\": \"{{telefoneTeste}}\",\n  \"canal_lead\": \"form_caixa\",\n  \"origem_midia\": \"instagram\",\n  \"fornecedor_atual\": \"Não utiliza tag atualmente\",\n  \"necessidade_principal\": \"Centralizar e melhorar o controle das despesas da frota\",\n  \"interesse_demonstrado\": \"Demonstrou interesse em avançar com a contratação\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/addleadfocare",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "addleadfocare"
-              ]
-            },
-            "description": "Atenção: cria um cliente de teste e envia um WhatsApp real para {{telefoneTeste}}."
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 200\", () => pm.response.to.have.status(200));",
-                  "const r = pm.response.json();",
-                  "pm.test(\"devolve codmailing\", () => pm.expect(r.codmailing).to.be.above(0));",
-                  "pm.collectionVariables.set(\"codmailing\", r.codmailing);"
-                ]
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "// documento único por execução (não duplica cliente CPF+PRODUTO)",
-                  "const n = Date.now().toString().slice(-10);",
-                  "pm.collectionVariables.set(\"cpfTeste\", \"PM\" + n);",
-                  "pm.collectionVariables.set(\"cnpjPerfil\", \"99\" + n + \"01\");",
-                  "const d = new Date(); const p = x => String(x).padStart(2, \"0\");",
-                  "pm.collectionVariables.set(\"dataCadastro\", `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`);"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "04 addleadfocare - sem token",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"data_cadastro\": \"{{dataCadastro}}\",\n  \"produto\": \"CARTAO_BENEFICIO\",\n  \"tp_cliente\": \"PJ\",\n  \"qtde_func\": \"50\",\n  \"perfil_mailing\": \"{{cnpjPerfil}}\",\n  \"cpf\": \"{{cpfTeste}}\",\n  \"nome\": \"Empresa Teste Postman LTDA\",\n  \"nome_fantasia\": \"Teste Postman\",\n  \"dt_abertura\": \"2010-05-20\",\n  \"cnae\": \"João da Silva (decisor)\",\n  \"desc_cnae\": \"(11) 97777-6666\",\n  \"sr\": \"Diretor financeiro\",\n  \"sev\": \"Frota própria\",\n  \"agencia\": \"1234\",\n  \"id_agencia\": \"5678\",\n  \"operacao\": \"Planilha manual\",\n  \"telefone\": \"{{telefoneTeste}}\",\n  \"canal_lead\": \"form_caixa\",\n  \"origem_midia\": \"instagram\",\n  \"fornecedor_atual\": \"Não utiliza tag atualmente\",\n  \"necessidade_principal\": \"Centralizar e melhorar o controle das despesas da frota\",\n  \"interesse_demonstrado\": \"Demonstrou interesse em avançar com a contratação\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/addleadfocare",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "addleadfocare"
-              ]
-            },
-            "description": ""
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 401\", () => pm.response.to.have.status(401));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "05 addleadfocare - sem cpf",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"data_cadastro\": \"{{dataCadastro}}\",\n  \"produto\": \"CARTAO_BENEFICIO\",\n  \"tp_cliente\": \"PJ\",\n  \"qtde_func\": \"50\",\n  \"perfil_mailing\": \"{{cnpjPerfil}}\",\n  \"cpf\": \"\",\n  \"nome\": \"Empresa Teste Postman LTDA\",\n  \"nome_fantasia\": \"Teste Postman\",\n  \"dt_abertura\": \"2010-05-20\",\n  \"cnae\": \"João da Silva (decisor)\",\n  \"desc_cnae\": \"(11) 97777-6666\",\n  \"sr\": \"Diretor financeiro\",\n  \"sev\": \"Frota própria\",\n  \"agencia\": \"1234\",\n  \"id_agencia\": \"5678\",\n  \"operacao\": \"Planilha manual\",\n  \"telefone\": \"{{telefoneTeste}}\",\n  \"canal_lead\": \"form_caixa\",\n  \"origem_midia\": \"instagram\",\n  \"fornecedor_atual\": \"Não utiliza tag atualmente\",\n  \"necessidade_principal\": \"Centralizar e melhorar o controle das despesas da frota\",\n  \"interesse_demonstrado\": \"Demonstrou interesse em avançar com a contratação\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/addleadfocare",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "addleadfocare"
-              ]
-            },
-            "description": ""
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 400\", () => pm.response.to.have.status(400));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "06 addleadfocare - dt_abertura inválida",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"data_cadastro\": \"{{dataCadastro}}\",\n  \"produto\": \"CARTAO_BENEFICIO\",\n  \"tp_cliente\": \"PJ\",\n  \"qtde_func\": \"50\",\n  \"perfil_mailing\": \"{{cnpjPerfil}}\",\n  \"cpf\": \"{{cpfTeste}}X\",\n  \"nome\": \"Empresa Teste Postman LTDA\",\n  \"nome_fantasia\": \"Teste Postman\",\n  \"dt_abertura\": \"20/05/2010\",\n  \"cnae\": \"João da Silva (decisor)\",\n  \"desc_cnae\": \"(11) 97777-6666\",\n  \"sr\": \"Diretor financeiro\",\n  \"sev\": \"Frota própria\",\n  \"agencia\": \"1234\",\n  \"id_agencia\": \"5678\",\n  \"operacao\": \"Planilha manual\",\n  \"telefone\": \"{{telefoneTeste}}\",\n  \"canal_lead\": \"form_caixa\",\n  \"origem_midia\": \"instagram\",\n  \"fornecedor_atual\": \"Não utiliza tag atualmente\",\n  \"necessidade_principal\": \"Centralizar e melhorar o controle das despesas da frota\",\n  \"interesse_demonstrado\": \"Demonstrou interesse em avançar com a contratação\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/addleadfocare",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "addleadfocare"
-              ]
-            },
-            "description": ""
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 400\", () => pm.response.to.have.status(400));"
-                ]
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "3 - consultacliente",
-      "item": [
-        {
-          "name": "07 consultacliente - pelo cnpj (cpf do lead)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"cnpj\": \"{{cpfTeste}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/consultacliente",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "consultacliente"
-              ]
-            },
-            "description": "Guarda o codprospect do cliente criado no teste 03."
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 200\", () => pm.response.to.have.status(200));",
-                  "const r = pm.response.json();",
-                  "pm.test(\"achou 1 cliente ou mais\", () => pm.expect(r.total).to.be.above(0));",
-                  "const c = r.clientes[0];",
-                  "pm.test(\"campos novos gravados\", () => {",
-                  "  pm.expect(c.fornecedor_atual).to.eql(\"Não utiliza tag atualmente\");",
-                  "  pm.expect(c.necessidade_principal).to.not.be.empty;",
-                  "  pm.expect(c.interesse_demonstrado).to.not.be.empty;",
-                  "});",
-                  "pm.test(\"dt_abertura yyyy-MM-dd e id_agencia número\", () => {",
-                  "  pm.expect(c.dt_abertura).to.eql(\"2010-05-20\");",
-                  "  pm.expect(String(c.id_agencia)).to.eql(\"5678\");",
-                  "});",
-                  "pm.test(\"telefone gravado só com dígitos\", () => pm.expect(c.telefone).to.match(/^\\d+$/));",
-                  "pm.collectionVariables.set(\"codprospect\", c.codprospect);"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "08 consultacliente - pelo CNPJ em perfil_mailing",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"cnpj\": \"{{cnpjPerfil}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/consultacliente",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "consultacliente"
-              ]
-            },
-            "description": ""
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 200\", () => pm.response.to.have.status(200));",
-                  "pm.test(\"mesmo cliente\", () => pm.expect(pm.response.json().clientes.map(c => String(c.codprospect))).to.include(String(pm.collectionVariables.get(\"codprospect\"))));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "09 consultacliente - pelo codprospect",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"codprospect\": \"{{codprospect}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/consultacliente",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "consultacliente"
-              ]
-            },
-            "description": ""
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 200\", () => pm.response.to.have.status(200));",
-                  "pm.test(\"total = 1\", () => pm.expect(pm.response.json().total).to.eql(1));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "10 consultacliente - com pontuação",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"cpf\": \"{{cnpjPerfil}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/consultacliente",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "consultacliente"
-              ]
-            },
-            "description": ""
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 200\", () => pm.response.to.have.status(200));"
-                ]
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const c = pm.collectionVariables.get(\"cnpjPerfil\");",
-                  "pm.request.body.raw = JSON.stringify({ cnpj: c.replace(/^(\\d{2})(\\d{3})(\\d{3})(\\d{4})(\\d{2})$/, \"$1.$2.$3/$4-$5\") });"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11 consultacliente - sem filtro",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/consultacliente",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "consultacliente"
-              ]
-            },
-            "description": ""
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 400\", () => pm.response.to.have.status(400));",
-                  "pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "12 consultacliente - cpf e cnpj diferentes",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"cpf\": \"AAA111\",\n  \"cnpj\": \"BBB222\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/consultacliente",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "consultacliente"
-              ]
-            },
-            "description": ""
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 400\", () => pm.response.to.have.status(400));",
-                  "pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "13 consultacliente - não existe",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"cnpj\": \"NAOEXISTE000000\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/consultacliente",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "consultacliente"
-              ]
-            },
-            "description": ""
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 404\", () => pm.response.to.have.status(404));",
-                  "pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "14 consultacliente - sem token",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"codprospect\": \"{{codprospect}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/consultacliente",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "consultacliente"
-              ]
-            },
-            "description": ""
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 401\", () => pm.response.to.have.status(401));"
-                ]
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "4 - atualizacliente",
-      "item": [
-        {
-          "name": "15 atualizacliente - OK",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"codprospect\": \"{{codprospect}}\",\n  \"qtde_func\": \"75\",\n  \"id_agencia\": \"789\",\n  \"telefone\": \"{{telefoneTeste}}\",\n  \"nome\": \"\",\n  \"agencia\": \"\",\n  \"fornecedor_atual\": \"Concorrente X\",\n  \"necessidade_principal\": \"Antecipação de recebíveis\",\n  \"interesse_demonstrado\": \"Médio\",\n  \"desc_cnae\": \"Texto propositalmente maior que cinquenta caracteres para testar o corte\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/atualizacliente",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "atualizacliente"
-              ]
-            },
-            "description": ""
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 200\", () => pm.response.to.have.status(200));",
-                  "const r = pm.response.json();",
-                  "pm.test(\"campos atualizados\", () => pm.expect(r.camposAtualizados).to.include.members([\"qtde_func\",\"id_agencia\",\"fornecedor_atual\",\"necessidade_principal\",\"interesse_demonstrado\"]));",
-                  "pm.test(\"vazios não mexem\", () => pm.expect(r.camposAtualizados).to.not.include.members([\"nome\",\"agencia\"]));",
-                  "pm.test(\"desc_cnae cortado em 50\", () => pm.expect(r.cliente.desc_cnae.length).to.eql(50));",
-                  "pm.test(\"id_agencia = 789\", () => pm.expect(String(r.cliente.id_agencia)).to.eql(\"789\"));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "16 atualizacliente - repetido (sem alteração)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"codprospect\": \"{{codprospect}}\",\n  \"qtde_func\": \"75\",\n  \"id_agencia\": \"789\",\n  \"telefone\": \"{{telefoneTeste}}\",\n  \"nome\": \"\",\n  \"agencia\": \"\",\n  \"fornecedor_atual\": \"Concorrente X\",\n  \"necessidade_principal\": \"Antecipação de recebíveis\",\n  \"interesse_demonstrado\": \"Médio\",\n  \"desc_cnae\": \"Texto propositalmente maior que cinquenta caracteres para testar o corte\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/atualizacliente",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "atualizacliente"
-              ]
-            },
-            "description": ""
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 200\", () => pm.response.to.have.status(200));",
-                  "pm.test(\"nada para atualizar\", () => pm.expect(pm.response.json().camposAtualizados).to.be.empty);"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "17 atualizacliente - id_agencia não numérico",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"codprospect\": \"{{codprospect}}\",\n  \"id_agencia\": \"ABC\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/atualizacliente",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "atualizacliente"
-              ]
-            },
-            "description": ""
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 400\", () => pm.response.to.have.status(400));",
-                  "pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "18 atualizacliente - dt_abertura inválida",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"codprospect\": \"{{codprospect}}\",\n  \"dt_abertura\": \"20/05/2010\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/atualizacliente",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "atualizacliente"
-              ]
-            },
-            "description": ""
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 400\", () => pm.response.to.have.status(400));",
-                  "pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "19 atualizacliente - sem codprospect",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nome\": \"X\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/atualizacliente",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "atualizacliente"
-              ]
-            },
-            "description": ""
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 400\", () => pm.response.to.have.status(400));",
-                  "pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "20 atualizacliente - não existe",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"codprospect\": \"99999999\",\n  \"nome\": \"X\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/atualizacliente",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "atualizacliente"
-              ]
-            },
-            "description": ""
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 404\", () => pm.response.to.have.status(404));",
-                  "pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "21 atualizacliente - sem token",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"codprospect\": \"{{codprospect}}\",\n  \"nome\": \"X\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/atualizacliente",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "atualizacliente"
-              ]
-            },
-            "description": ""
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 401\", () => pm.response.to.have.status(401));"
-                ]
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "5 - tabularlead",
-      "item": [
-        {
-          "name": "22 tabularlead - OK (atendente não reconhecido)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"codprospect\": \"{{codprospect}}\",\n  \"atendente\": \"Atendente Que Nao Existe\",\n  \"codtabulacao\": \"{{codtabulacao}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/tabularlead",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "tabularlead"
-              ]
-            },
-            "description": "Preencha {{codtabulacao}} com um código de tabulação informado pela Focare."
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 200\", () => pm.response.to.have.status(200));",
-                  "const r = pm.response.json();",
-                  "pm.test(\"gravou a chamada\", () => pm.expect(r.idChamada).to.be.above(0));",
-                  "pm.test(\"atendente não reconhecido\", () => pm.expect(r.atendenteEncontrado).to.eql(false));",
-                  "pm.test(\"devolve a descrição oficial\", () => pm.expect(r.desctabulacao).to.not.be.empty);"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "23 tabularlead - atendente pelo nome",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"codprospect\": \"{{codprospect}}\",\n  \"atendente\": \"{{atendente}}\",\n  \"codtabulacao\": \"{{codtabulacao2}}\",\n  \"datainicio\": \"{{dataCadastro}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/tabularlead",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "tabularlead"
-              ]
-            },
-            "description": "Preencha {{atendente}} (nome de um atendente cadastrado) e {{codtabulacao2}} (outro código de tabulação, diferente de {{codtabulacao}})."
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 200\", () => pm.response.to.have.status(200));",
-                  "pm.test(\"atendente encontrado\", () => pm.expect(pm.response.json().atendenteEncontrado).to.eql(true));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "24 tabularlead - duplicada em 30 min (apelido codcliente)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"codcliente\": \"{{codprospect}}\",\n  \"codtabulacao\": \"{{codtabulacao}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/tabularlead",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "tabularlead"
-              ]
-            },
-            "description": "Mesma tabulação do teste 22 para o mesmo cliente: a trava de 30 min deve recusar."
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 409\", () => pm.response.to.have.status(409));",
-                  "const r = pm.response.json();",
-                  "pm.test(\"aponta a chamada existente\", () => pm.expect(r.idChamadaExistente).to.be.above(0));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "25 tabularlead - tabulação inexistente",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"codprospect\": \"{{codprospect}}\",\n  \"codtabulacao\": \"999999\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/tabularlead",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "tabularlead"
-              ]
-            },
-            "description": ""
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 400\", () => pm.response.to.have.status(400));",
-                  "pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "26 tabularlead - datainicio inválida",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"codprospect\": \"{{codprospect}}\",\n  \"codtabulacao\": \"{{codtabulacao}}\",\n  \"datainicio\": \"30/09/2026\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/tabularlead",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "tabularlead"
-              ]
-            },
-            "description": ""
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 400\", () => pm.response.to.have.status(400));",
-                  "pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "27 tabularlead - sem codtabulacao",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"codprospect\": \"{{codprospect}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/tabularlead",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "tabularlead"
-              ]
-            },
-            "description": ""
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 400\", () => pm.response.to.have.status(400));",
-                  "pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "28 tabularlead - cliente não existe",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"codprospect\": \"99999999\",\n  \"codtabulacao\": \"{{codtabulacao}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/tabularlead",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "tabularlead"
-              ]
-            },
-            "description": ""
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 404\", () => pm.response.to.have.status(404));",
-                  "pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "29 tabularlead - sem token",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"codprospect\": \"{{codprospect}}\",\n  \"codtabulacao\": \"{{codtabulacao}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/interface/tabularlead",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "interface",
-                "tabularlead"
-              ]
-            },
-            "description": ""
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"status 401\", () => pm.response.to.have.status(401));"
-                ]
-              }
-            }
-          ]
-        }
-      ]
-    }
-  ],
-  "variable": [
-    {
-      "key": "baseUrl",
-      "value": ""
-    },
-    {
-      "key": "login",
-      "value": ""
-    },
-    {
-      "key": "senha",
-      "value": ""
-    },
-    {
-      "key": "token",
-      "value": ""
-    },
-    {
-      "key": "telefoneTeste",
-      "value": ""
-    },
-    {
-      "key": "codtabulacao",
-      "value": ""
-    },
-    {
-      "key": "codtabulacao2",
-      "value": ""
-    },
-    {
-      "key": "atendente",
-      "value": ""
-    },
-    {
-      "key": "cpfTeste",
-      "value": ""
-    },
-    {
-      "key": "cnpjPerfil",
-      "value": ""
-    },
-    {
-      "key": "dataCadastro",
-      "value": ""
-    },
-    {
-      "key": "codmailing",
-      "value": ""
-    },
-    {
-      "key": "codprospect",
-      "value": ""
-    }
-  ]
+	"info": {
+		"name": "API de Integração Comercial - Caixa B2B",
+		"_postman_id": "a1b2c3d4-0930-4c41-9ab2-integracaocx",
+		"description": "Chamadas e testes automáticos da API de Integração Comercial Caixa B2B (Focare).\n\nComo usar:\n1. Em Variables, confira baseUrl (já preenchido com https://focare-techia.actionline.com.br:30454) e preencha login e senha de integração, telefoneTeste (um número da sua equipe: o envio de lead gera um WhatsApp real), codtabulacao e codtabulacao2 (dois códigos de tabulação diferentes informados pela Focare) e atendente (nome de um atendente cadastrado).\n2. Rode a coleção inteira em ordem (Run collection). O token, o documento de teste e o codprospect são preenchidos automaticamente.\n\nCada execução cria um cliente de teste: combine com a Focare o ambiente antes de rodar.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1 - Autenticação",
+			"item": [
+				{
+					"name": "01 Autenticação - OK",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"login\": \"{{login}}\",\n  \"senha\": \"{{senha}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/autenticacao",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"autenticacao"
+							]
+						},
+						"description": "Guarda o token na variável {{token}} usada pelos outros testes."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+									"const t = pm.response.json();",
+									"pm.test(\"devolve o token (string)\", () => pm.expect(t).to.be.a(\"string\").and.not.empty);",
+									"pm.collectionVariables.set(\"token\", t);"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "02 Autenticação - senha errada",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"login\": \"{{login}}\",\n  \"senha\": \"senha-errada-teste\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/autenticacao",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"autenticacao"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 400\", () => pm.response.to.have.status(400));"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "2 - addleadfocare",
+			"item": [
+				{
+					"name": "03 addleadfocare - OK (envia WhatsApp real)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data_cadastro\": \"{{dataCadastro}}\",\n  \"produto\": \"CARTAO_BENEFICIO\",\n  \"tp_cliente\": \"PJ\",\n  \"qtde_func\": \"50\",\n  \"perfil_mailing\": \"{{cnpjPerfil}}\",\n  \"cpf\": \"{{cpfTeste}}\",\n  \"nome\": \"Empresa Teste Postman LTDA\",\n  \"nome_fantasia\": \"Teste Postman\",\n  \"dt_abertura\": \"2010-05-20\",\n  \"cnae\": \"João da Silva (decisor)\",\n  \"desc_cnae\": \"(11) 97777-6666\",\n  \"sr\": \"Diretor financeiro\",\n  \"sev\": \"Frota própria\",\n  \"agencia\": \"1234\",\n  \"id_agencia\": \"5678\",\n  \"operacao\": \"Planilha manual\",\n  \"telefone\": \"{{telefoneTeste}}\",\n  \"canal_lead\": \"form_caixa\",\n  \"origem_midia\": \"instagram\",\n  \"fornecedor_atual\": \"Não utiliza tag atualmente\",\n  \"necessidade_principal\": \"Centralizar e melhorar o controle das despesas da frota\",\n  \"interesse_demonstrado\": \"Demonstrou interesse em avançar com a contratação\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/addleadfocare",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"addleadfocare"
+							]
+						},
+						"description": "Atenção: cria um cliente de teste e envia um WhatsApp real para {{telefoneTeste}}."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+									"const r = pm.response.json();",
+									"pm.test(\"devolve codmailing\", () => pm.expect(r.codmailing).to.be.above(0));",
+									"pm.collectionVariables.set(\"codmailing\", r.codmailing);"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// documento único por execução (não duplica cliente CPF+PRODUTO)",
+									"const n = Date.now().toString().slice(-10);",
+									"pm.collectionVariables.set(\"cpfTeste\", \"PM\" + n);",
+									"pm.collectionVariables.set(\"cnpjPerfil\", \"99\" + n + \"01\");",
+									"const d = new Date(); const p = x => String(x).padStart(2, \"0\");",
+									"pm.collectionVariables.set(\"dataCadastro\", `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`);"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "04 addleadfocare - sem token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data_cadastro\": \"{{dataCadastro}}\",\n  \"produto\": \"CARTAO_BENEFICIO\",\n  \"tp_cliente\": \"PJ\",\n  \"qtde_func\": \"50\",\n  \"perfil_mailing\": \"{{cnpjPerfil}}\",\n  \"cpf\": \"{{cpfTeste}}\",\n  \"nome\": \"Empresa Teste Postman LTDA\",\n  \"nome_fantasia\": \"Teste Postman\",\n  \"dt_abertura\": \"2010-05-20\",\n  \"cnae\": \"João da Silva (decisor)\",\n  \"desc_cnae\": \"(11) 97777-6666\",\n  \"sr\": \"Diretor financeiro\",\n  \"sev\": \"Frota própria\",\n  \"agencia\": \"1234\",\n  \"id_agencia\": \"5678\",\n  \"operacao\": \"Planilha manual\",\n  \"telefone\": \"{{telefoneTeste}}\",\n  \"canal_lead\": \"form_caixa\",\n  \"origem_midia\": \"instagram\",\n  \"fornecedor_atual\": \"Não utiliza tag atualmente\",\n  \"necessidade_principal\": \"Centralizar e melhorar o controle das despesas da frota\",\n  \"interesse_demonstrado\": \"Demonstrou interesse em avançar com a contratação\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/addleadfocare",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"addleadfocare"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 401\", () => pm.response.to.have.status(401));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "05 addleadfocare - sem cpf",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data_cadastro\": \"{{dataCadastro}}\",\n  \"produto\": \"CARTAO_BENEFICIO\",\n  \"tp_cliente\": \"PJ\",\n  \"qtde_func\": \"50\",\n  \"perfil_mailing\": \"{{cnpjPerfil}}\",\n  \"cpf\": \"\",\n  \"nome\": \"Empresa Teste Postman LTDA\",\n  \"nome_fantasia\": \"Teste Postman\",\n  \"dt_abertura\": \"2010-05-20\",\n  \"cnae\": \"João da Silva (decisor)\",\n  \"desc_cnae\": \"(11) 97777-6666\",\n  \"sr\": \"Diretor financeiro\",\n  \"sev\": \"Frota própria\",\n  \"agencia\": \"1234\",\n  \"id_agencia\": \"5678\",\n  \"operacao\": \"Planilha manual\",\n  \"telefone\": \"{{telefoneTeste}}\",\n  \"canal_lead\": \"form_caixa\",\n  \"origem_midia\": \"instagram\",\n  \"fornecedor_atual\": \"Não utiliza tag atualmente\",\n  \"necessidade_principal\": \"Centralizar e melhorar o controle das despesas da frota\",\n  \"interesse_demonstrado\": \"Demonstrou interesse em avançar com a contratação\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/addleadfocare",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"addleadfocare"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 400\", () => pm.response.to.have.status(400));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "06 addleadfocare - dt_abertura inválida",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data_cadastro\": \"{{dataCadastro}}\",\n  \"produto\": \"CARTAO_BENEFICIO\",\n  \"tp_cliente\": \"PJ\",\n  \"qtde_func\": \"50\",\n  \"perfil_mailing\": \"{{cnpjPerfil}}\",\n  \"cpf\": \"{{cpfTeste}}X\",\n  \"nome\": \"Empresa Teste Postman LTDA\",\n  \"nome_fantasia\": \"Teste Postman\",\n  \"dt_abertura\": \"20/05/2010\",\n  \"cnae\": \"João da Silva (decisor)\",\n  \"desc_cnae\": \"(11) 97777-6666\",\n  \"sr\": \"Diretor financeiro\",\n  \"sev\": \"Frota própria\",\n  \"agencia\": \"1234\",\n  \"id_agencia\": \"5678\",\n  \"operacao\": \"Planilha manual\",\n  \"telefone\": \"{{telefoneTeste}}\",\n  \"canal_lead\": \"form_caixa\",\n  \"origem_midia\": \"instagram\",\n  \"fornecedor_atual\": \"Não utiliza tag atualmente\",\n  \"necessidade_principal\": \"Centralizar e melhorar o controle das despesas da frota\",\n  \"interesse_demonstrado\": \"Demonstrou interesse em avançar com a contratação\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/addleadfocare",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"addleadfocare"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 400\", () => pm.response.to.have.status(400));"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "3 - consultacliente",
+			"item": [
+				{
+					"name": "07 consultacliente - pelo cnpj (cpf do lead)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cnpj\": \"{{cpfTeste}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/consultacliente",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"consultacliente"
+							]
+						},
+						"description": "Guarda o codprospect do cliente criado no teste 03."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+									"const r = pm.response.json();",
+									"pm.test(\"achou 1 cliente ou mais\", () => pm.expect(r.total).to.be.above(0));",
+									"const c = r.clientes[0];",
+									"pm.test(\"campos novos gravados\", () => {",
+									"  pm.expect(c.fornecedor_atual).to.eql(\"Não utiliza tag atualmente\");",
+									"  pm.expect(c.necessidade_principal).to.not.be.empty;",
+									"  pm.expect(c.interesse_demonstrado).to.not.be.empty;",
+									"});",
+									"pm.test(\"dt_abertura yyyy-MM-dd e id_agencia número\", () => {",
+									"  pm.expect(c.dt_abertura).to.eql(\"2010-05-20\");",
+									"  pm.expect(String(c.id_agencia)).to.eql(\"5678\");",
+									"});",
+									"pm.test(\"telefone gravado só com dígitos\", () => pm.expect(c.telefone).to.match(/^\\d+$/));",
+									"pm.collectionVariables.set(\"codprospect\", c.codprospect);"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "08 consultacliente - pelo CNPJ em perfil_mailing",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cnpj\": \"{{cnpjPerfil}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/consultacliente",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"consultacliente"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+									"pm.test(\"mesmo cliente\", () => pm.expect(pm.response.json().clientes.map(c => String(c.codprospect))).to.include(String(pm.collectionVariables.get(\"codprospect\"))));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "09 consultacliente - pelo codprospect",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"codprospect\": \"{{codprospect}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/consultacliente",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"consultacliente"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+									"pm.test(\"total = 1\", () => pm.expect(pm.response.json().total).to.eql(1));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "10 consultacliente - com pontuação",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cpf\": \"{{cnpjPerfil}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/consultacliente",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"consultacliente"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 200\", () => pm.response.to.have.status(200));"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const c = pm.collectionVariables.get(\"cnpjPerfil\");",
+									"pm.request.body.raw = JSON.stringify({ cnpj: c.replace(/^(\\d{2})(\\d{3})(\\d{3})(\\d{4})(\\d{2})$/, \"$1.$2.$3/$4-$5\") });"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "11 consultacliente - sem filtro",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/consultacliente",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"consultacliente"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 400\", () => pm.response.to.have.status(400));",
+									"pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "12 consultacliente - cpf e cnpj diferentes",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cpf\": \"AAA111\",\n  \"cnpj\": \"BBB222\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/consultacliente",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"consultacliente"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 400\", () => pm.response.to.have.status(400));",
+									"pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "13 consultacliente - não existe",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cnpj\": \"NAOEXISTE000000\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/consultacliente",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"consultacliente"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 404\", () => pm.response.to.have.status(404));",
+									"pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "14 consultacliente - sem token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"codprospect\": \"{{codprospect}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/consultacliente",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"consultacliente"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 401\", () => pm.response.to.have.status(401));"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "4 - atualizacliente",
+			"item": [
+				{
+					"name": "15 atualizacliente - OK",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"codprospect\": \"{{codprospect}}\",\n  \"qtde_func\": \"75\",\n  \"id_agencia\": \"789\",\n  \"telefone\": \"{{telefoneTeste}}\",\n  \"nome\": \"\",\n  \"agencia\": \"\",\n  \"fornecedor_atual\": \"Concorrente X\",\n  \"necessidade_principal\": \"Antecipação de recebíveis\",\n  \"interesse_demonstrado\": \"Médio\",\n  \"desc_cnae\": \"Texto propositalmente maior que cinquenta caracteres para testar o corte\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/atualizacliente",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"atualizacliente"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+									"const r = pm.response.json();",
+									"pm.test(\"campos atualizados\", () => pm.expect(r.camposAtualizados).to.include.members([\"qtde_func\",\"id_agencia\",\"fornecedor_atual\",\"necessidade_principal\",\"interesse_demonstrado\"]));",
+									"pm.test(\"vazios não mexem\", () => pm.expect(r.camposAtualizados).to.not.include.members([\"nome\",\"agencia\"]));",
+									"pm.test(\"desc_cnae cortado em 50\", () => pm.expect(r.cliente.desc_cnae.length).to.eql(50));",
+									"pm.test(\"id_agencia = 789\", () => pm.expect(String(r.cliente.id_agencia)).to.eql(\"789\"));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "16 atualizacliente - repetido (sem alteração)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"codprospect\": \"{{codprospect}}\",\n  \"qtde_func\": \"75\",\n  \"id_agencia\": \"789\",\n  \"telefone\": \"{{telefoneTeste}}\",\n  \"nome\": \"\",\n  \"agencia\": \"\",\n  \"fornecedor_atual\": \"Concorrente X\",\n  \"necessidade_principal\": \"Antecipação de recebíveis\",\n  \"interesse_demonstrado\": \"Médio\",\n  \"desc_cnae\": \"Texto propositalmente maior que cinquenta caracteres para testar o corte\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/atualizacliente",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"atualizacliente"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+									"pm.test(\"nada para atualizar\", () => pm.expect(pm.response.json().camposAtualizados).to.be.empty);"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "17 atualizacliente - id_agencia não numérico",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"codprospect\": \"{{codprospect}}\",\n  \"id_agencia\": \"ABC\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/atualizacliente",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"atualizacliente"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 400\", () => pm.response.to.have.status(400));",
+									"pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "18 atualizacliente - dt_abertura inválida",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"codprospect\": \"{{codprospect}}\",\n  \"dt_abertura\": \"20/05/2010\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/atualizacliente",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"atualizacliente"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 400\", () => pm.response.to.have.status(400));",
+									"pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "19 atualizacliente - sem codprospect",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"X\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/atualizacliente",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"atualizacliente"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 400\", () => pm.response.to.have.status(400));",
+									"pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "20 atualizacliente - não existe",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"codprospect\": \"99999999\",\n  \"nome\": \"X\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/atualizacliente",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"atualizacliente"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 404\", () => pm.response.to.have.status(404));",
+									"pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "21 atualizacliente - sem token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"codprospect\": \"{{codprospect}}\",\n  \"nome\": \"X\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/atualizacliente",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"atualizacliente"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 401\", () => pm.response.to.have.status(401));"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "5 - tabularlead",
+			"item": [
+				{
+					"name": "22 tabularlead - OK (atendente não reconhecido)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"codprospect\": \"{{codprospect}}\",\n  \"atendente\": \"Atendente Que Nao Existe\",\n  \"codtabulacao\": \"{{codtabulacao}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/tabularlead",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"tabularlead"
+							]
+						},
+						"description": "Preencha {{codtabulacao}} com um código de tabulação informado pela Focare."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+									"const r = pm.response.json();",
+									"pm.test(\"gravou a chamada\", () => pm.expect(r.idChamada).to.be.above(0));",
+									"pm.test(\"atendente não reconhecido\", () => pm.expect(r.atendenteEncontrado).to.eql(false));",
+									"pm.test(\"devolve a descrição oficial\", () => pm.expect(r.desctabulacao).to.not.be.empty);"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "23 tabularlead - atendente pelo nome",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"codprospect\": \"{{codprospect}}\",\n  \"atendente\": \"{{atendente}}\",\n  \"codtabulacao\": \"{{codtabulacao2}}\",\n  \"datainicio\": \"{{dataCadastro}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/tabularlead",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"tabularlead"
+							]
+						},
+						"description": "Preencha {{atendente}} (nome de um atendente cadastrado) e {{codtabulacao2}} (outro código de tabulação, diferente de {{codtabulacao}})."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+									"pm.test(\"atendente encontrado\", () => pm.expect(pm.response.json().atendenteEncontrado).to.eql(true));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "24 tabularlead - duplicada em 30 min (apelido codcliente)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"codcliente\": \"{{codprospect}}\",\n  \"codtabulacao\": \"{{codtabulacao}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/tabularlead",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"tabularlead"
+							]
+						},
+						"description": "Mesma tabulação do teste 22 para o mesmo cliente: a trava de 30 min deve recusar."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 409\", () => pm.response.to.have.status(409));",
+									"const r = pm.response.json();",
+									"pm.test(\"aponta a chamada existente\", () => pm.expect(r.idChamadaExistente).to.be.above(0));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "25 tabularlead - tabulação inexistente",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"codprospect\": \"{{codprospect}}\",\n  \"codtabulacao\": \"999999\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/tabularlead",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"tabularlead"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 400\", () => pm.response.to.have.status(400));",
+									"pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "26 tabularlead - datainicio inválida",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"codprospect\": \"{{codprospect}}\",\n  \"codtabulacao\": \"{{codtabulacao}}\",\n  \"datainicio\": \"30/09/2026\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/tabularlead",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"tabularlead"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 400\", () => pm.response.to.have.status(400));",
+									"pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "27 tabularlead - sem codtabulacao",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"codprospect\": \"{{codprospect}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/tabularlead",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"tabularlead"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 400\", () => pm.response.to.have.status(400));",
+									"pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "28 tabularlead - cliente não existe",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"codprospect\": \"99999999\",\n  \"codtabulacao\": \"{{codtabulacao}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/tabularlead",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"tabularlead"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 404\", () => pm.response.to.have.status(404));",
+									"pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "29 tabularlead - sem token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"codprospect\": \"{{codprospect}}\",\n  \"codtabulacao\": \"{{codtabulacao}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/tabularlead",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"tabularlead"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 401\", () => pm.response.to.have.status(401));"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "6 - addclientedireto",
+			"item": [
+				{
+					"name": "30 addclientedireto - OK wpp_direct",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"origem\": \"wpp_direct\",\n  \"produto\": \"CARTAO_BENEFICIO\",\n  \"tp_cliente\": \"PJ\",\n  \"qtde_func\": \"50\",\n  \"perfil_mailing\": \"{{cpfDireto}}\",\n  \"cpf\": \"{{cpfDireto}}\",\n  \"nome\": \"Empresa Teste Direto LTDA\",\n  \"nome_fantasia\": \"Teste Direto\",\n  \"dt_abertura\": \"2010-05-20\",\n  \"cnae\": \"João da Silva\",\n  \"desc_cnae\": \"(11) 97777-6666\",\n  \"sr\": \"Diretor financeiro\",\n  \"sev\": \"Frota própria\",\n  \"agencia\": \"1234\",\n  \"id_agencia\": \"5678\",\n  \"operacao\": \"Planilha manual\",\n  \"telefone\": \"{{telefoneTeste}}\",\n  \"origem_midia\": \"whatsapp\",\n  \"fornecedor_atual\": \"Não utiliza tag atualmente\",\n  \"necessidade_principal\": \"Centralizar o controle das despesas da frota\",\n  \"interesse_demonstrado\": \"Demonstrou interesse em avançar com a contratação\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/addclientedireto",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"addclientedireto"
+							]
+						},
+						"description": "Cria um cliente de teste. Não envia mensagem ao telefone informado."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+									"const r = pm.response.json();",
+									"pm.test(\"cliente novo\", () => pm.expect(r.jaExistia).to.eql(false));",
+									"pm.test(\"devolve codprospect\", () => pm.expect(r.codprospect).to.be.above(0));",
+									"pm.test(\"origem wpp_direct\", () => pm.expect(r.origem).to.eql(\"wpp_direct\"));",
+									"pm.collectionVariables.set(\"codprospectDireto\", r.codprospect);"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// documento único por execução (cliente novo a cada rodada)",
+									"pm.collectionVariables.set(\"cpfDireto\", \"PD\" + Date.now().toString().slice(-10));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "31 addclientedireto - cliente já existe",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"origem\": \"wpp_direct\",\n  \"produto\": \"CARTAO_BENEFICIO\",\n  \"tp_cliente\": \"PJ\",\n  \"qtde_func\": \"50\",\n  \"perfil_mailing\": \"{{cpfDireto}}\",\n  \"cpf\": \"{{cpfDireto}}\",\n  \"nome\": \"Empresa Teste Direto LTDA\",\n  \"nome_fantasia\": \"Teste Direto\",\n  \"dt_abertura\": \"2010-05-20\",\n  \"cnae\": \"João da Silva\",\n  \"desc_cnae\": \"(11) 97777-6666\",\n  \"sr\": \"Diretor financeiro\",\n  \"sev\": \"Frota própria\",\n  \"agencia\": \"1234\",\n  \"id_agencia\": \"5678\",\n  \"operacao\": \"Planilha manual\",\n  \"telefone\": \"{{telefoneTeste}}\",\n  \"origem_midia\": \"whatsapp\",\n  \"fornecedor_atual\": \"Não utiliza tag atualmente\",\n  \"necessidade_principal\": \"Centralizar o controle das despesas da frota\",\n  \"interesse_demonstrado\": \"Demonstrou interesse em avançar com a contratação\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/addclientedireto",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"addclientedireto"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+									"const r = pm.response.json();",
+									"pm.test(\"jaExistia\", () => pm.expect(r.jaExistia).to.eql(true));",
+									"pm.test(\"mesmo codprospect\", () => pm.expect(String(r.codprospect)).to.eql(String(pm.collectionVariables.get(\"codprospectDireto\"))));",
+									"pm.test(\"orienta consultar e atualizar\", () => pm.expect(r.sucess).to.include(\"consultacliente\"));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "32 addclientedireto - cnx_direct (outro produto)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"origem\": \"cnx_direct\",\n  \"produto\": \"MAQUININHA\",\n  \"tp_cliente\": \"PJ\",\n  \"qtde_func\": \"50\",\n  \"perfil_mailing\": \"{{cpfDireto}}\",\n  \"cpf\": \"{{cpfDireto}}\",\n  \"nome\": \"Empresa Teste Direto LTDA\",\n  \"nome_fantasia\": \"Teste Direto\",\n  \"dt_abertura\": \"2010-05-20\",\n  \"cnae\": \"João da Silva\",\n  \"desc_cnae\": \"(11) 97777-6666\",\n  \"sr\": \"Diretor financeiro\",\n  \"sev\": \"Frota própria\",\n  \"agencia\": \"1234\",\n  \"id_agencia\": \"5678\",\n  \"operacao\": \"Planilha manual\",\n  \"telefone\": \"{{telefoneTeste}}\",\n  \"origem_midia\": \"whatsapp\",\n  \"fornecedor_atual\": \"Não utiliza tag atualmente\",\n  \"necessidade_principal\": \"Centralizar o controle das despesas da frota\",\n  \"interesse_demonstrado\": \"Demonstrou interesse em avançar com a contratação\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/addclientedireto",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"addclientedireto"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+									"const r = pm.response.json();",
+									"pm.test(\"cliente novo\", () => pm.expect(r.jaExistia).to.eql(false));",
+									"pm.test(\"origem cnx_direct\", () => pm.expect(r.origem).to.eql(\"cnx_direct\"));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "33 addclientedireto - origem inválida",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"origem\": \"whatsapp\",\n  \"produto\": \"OUTRO\",\n  \"tp_cliente\": \"PJ\",\n  \"qtde_func\": \"50\",\n  \"perfil_mailing\": \"{{cpfDireto}}\",\n  \"cpf\": \"{{cpfDireto}}\",\n  \"nome\": \"Empresa Teste Direto LTDA\",\n  \"nome_fantasia\": \"Teste Direto\",\n  \"dt_abertura\": \"2010-05-20\",\n  \"cnae\": \"João da Silva\",\n  \"desc_cnae\": \"(11) 97777-6666\",\n  \"sr\": \"Diretor financeiro\",\n  \"sev\": \"Frota própria\",\n  \"agencia\": \"1234\",\n  \"id_agencia\": \"5678\",\n  \"operacao\": \"Planilha manual\",\n  \"telefone\": \"{{telefoneTeste}}\",\n  \"origem_midia\": \"whatsapp\",\n  \"fornecedor_atual\": \"Não utiliza tag atualmente\",\n  \"necessidade_principal\": \"Centralizar o controle das despesas da frota\",\n  \"interesse_demonstrado\": \"Demonstrou interesse em avançar com a contratação\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/addclientedireto",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"addclientedireto"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 400\", () => pm.response.to.have.status(400));",
+									"pm.test(\"cita a origem\", () => pm.expect(pm.response.json().mensagem).to.include(\"origem\"));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "34 addclientedireto - sem origem",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"produto\": \"CARTAO_BENEFICIO\",\n  \"tp_cliente\": \"PJ\",\n  \"qtde_func\": \"50\",\n  \"perfil_mailing\": \"{{cpfDireto}}\",\n  \"cpf\": \"{{cpfDireto}}\",\n  \"nome\": \"Empresa Teste Direto LTDA\",\n  \"nome_fantasia\": \"Teste Direto\",\n  \"dt_abertura\": \"2010-05-20\",\n  \"cnae\": \"João da Silva\",\n  \"desc_cnae\": \"(11) 97777-6666\",\n  \"sr\": \"Diretor financeiro\",\n  \"sev\": \"Frota própria\",\n  \"agencia\": \"1234\",\n  \"id_agencia\": \"5678\",\n  \"operacao\": \"Planilha manual\",\n  \"telefone\": \"{{telefoneTeste}}\",\n  \"origem_midia\": \"whatsapp\",\n  \"fornecedor_atual\": \"Não utiliza tag atualmente\",\n  \"necessidade_principal\": \"Centralizar o controle das despesas da frota\",\n  \"interesse_demonstrado\": \"Demonstrou interesse em avançar com a contratação\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/addclientedireto",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"addclientedireto"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 400\", () => pm.response.to.have.status(400));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "35 addclientedireto - sem token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"origem\": \"wpp_direct\",\n  \"produto\": \"CARTAO_BENEFICIO\",\n  \"tp_cliente\": \"PJ\",\n  \"qtde_func\": \"50\",\n  \"perfil_mailing\": \"{{cpfDireto}}\",\n  \"cpf\": \"{{cpfDireto}}\",\n  \"nome\": \"Empresa Teste Direto LTDA\",\n  \"nome_fantasia\": \"Teste Direto\",\n  \"dt_abertura\": \"2010-05-20\",\n  \"cnae\": \"João da Silva\",\n  \"desc_cnae\": \"(11) 97777-6666\",\n  \"sr\": \"Diretor financeiro\",\n  \"sev\": \"Frota própria\",\n  \"agencia\": \"1234\",\n  \"id_agencia\": \"5678\",\n  \"operacao\": \"Planilha manual\",\n  \"telefone\": \"{{telefoneTeste}}\",\n  \"origem_midia\": \"whatsapp\",\n  \"fornecedor_atual\": \"Não utiliza tag atualmente\",\n  \"necessidade_principal\": \"Centralizar o controle das despesas da frota\",\n  \"interesse_demonstrado\": \"Demonstrou interesse em avançar com a contratação\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/addclientedireto",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"addclientedireto"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 401\", () => pm.response.to.have.status(401));"
+								]
+							}
+						}
+					]
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://focare-techia.actionline.com.br:30454"
+		},
+		{
+			"key": "login",
+			"value": ""
+		},
+		{
+			"key": "senha",
+			"value": ""
+		},
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "telefoneTeste",
+			"value": ""
+		},
+		{
+			"key": "codtabulacao",
+			"value": ""
+		},
+		{
+			"key": "codtabulacao2",
+			"value": ""
+		},
+		{
+			"key": "atendente",
+			"value": ""
+		},
+		{
+			"key": "cpfTeste",
+			"value": ""
+		},
+		{
+			"key": "cnpjPerfil",
+			"value": ""
+		},
+		{
+			"key": "dataCadastro",
+			"value": ""
+		},
+		{
+			"key": "codmailing",
+			"value": ""
+		},
+		{
+			"key": "codprospect",
+			"value": ""
+		},
+		{
+			"key": "cpfDireto",
+			"value": ""
+		},
+		{
+			"key": "codprospectDireto",
+			"value": ""
+		}
+	]
 }

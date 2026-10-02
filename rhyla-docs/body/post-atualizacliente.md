@@ -1,6 +1,6 @@
 # atualizacliente
 
-**POST** `/api/interface/atualizacliente` · Bearer
+**POST** `/api/interface/caixab2b/atualizacliente` · Bearer
 
 Atualiza os dados de um cliente. Envie o `codprospect` e só os campos que quer mudar. Campo vazio ou ausente não é alterado.
 

@@ -1,6 +1,6 @@
 # Como autenticar
 
-Gere o token em [`/api/interface/autenticacao`](./post-autenticacao.html) com o usuário e a senha de integração fornecidos pela Focare. Depois, envie-o em todas as outras chamadas:
+Gere o token em [`/api/interface/caixab2b/autenticacao`](./post-autenticacao.html) com o usuário e a senha de integração fornecidos pela Focare. Depois, envie-o em todas as outras chamadas:
 
 ```http
 Authorization: Bearer <token>
@@ -12,7 +12,7 @@ Content-Type: application/json
 - A resposta `401` explica o motivo:
 
 ```json
-{ "erro": true, "mensagem": "Token inválido ou expirado. Gere um novo em api/interface/autenticacao." }
+{ "erro": true, "mensagem": "Token inválido ou expirado. Gere um novo em api/interface/caixab2b/autenticacao." }
 ```
 
 | Mensagem | O que fazer |

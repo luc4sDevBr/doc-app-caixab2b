@@ -1,6 +1,6 @@
 # Campos do cliente (de-para)
 
-Os mesmos nomes valem no envio do lead ([addleadfocare](./post-addleadfocare.html)), na atualização ([atualizacliente](./post-atualizacliente.html)) e na resposta da consulta ([consultacliente](./post-consultacliente.html)).
+Os mesmos nomes valem no envio do lead ([addleadfocare](./post-addleadfocare.html)), na inclusão de cliente em conversa ([addclientedireto](./post-addclientedireto.html)), na atualização ([atualizacliente](./post-atualizacliente.html)) e na resposta da consulta ([consultacliente](./post-consultacliente.html)).
 
 > **Atenção ao significado:** alguns campos mantêm o nome técnico original, mas guardam outra informação na operação Caixa B2B. Eles estão marcados com ★ na tabela e resumidos logo abaixo.
 
@@ -25,7 +25,7 @@ Os mesmos nomes valem no envio do lead ([addleadfocare](./post-addleadfocare.htm
 | `id_agencia` | ID da agência | número inteiro | | `5678` |
 | `operacao` ★ | Processo / controle atual | texto, 200 | | `Planilha manual` |
 | `telefone` | Telefone da empresa, usado no contato por WhatsApp | DDD + número (10 ou 11 dígitos) | sim | `11999998888` |
-| `canal_lead` | Canal de origem do lead | texto, 10 | | `form_caixa` |
+| `canal_lead` | Canal de origem do lead (no `addclientedireto`, vem da `origem`) | texto, 10 | | `form_caixa` |
 | `origem_midia` | Mídia de origem | texto, 50 | | `instagram` |
 | `fornecedor_atual` | Fornecedor atual | texto, 200 | | `Não utiliza tag atualmente` |
 | `necessidade_principal` | Necessidade principal | texto, 500 | | `Centralizar o controle das despesas da frota` |

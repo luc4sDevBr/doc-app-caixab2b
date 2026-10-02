@@ -1,6 +1,6 @@
 # autenticacao
 
-**POST** `/api/interface/autenticacao` · sem token
+**POST** `/api/interface/caixab2b/autenticacao` · sem token
 
 Gera o token de acesso.
 
