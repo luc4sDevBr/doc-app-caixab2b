@@ -11,6 +11,36 @@ Envia um novo lead para a operação. Quando o lead é aceito, a empresa recebe 
 - Se já existe um cliente com o mesmo CPF/CNPJ e o mesmo produto, o lead é registrado, mas o cliente não é duplicado.
 - `canal_lead` identifica a origem do lead (ex.: `form_caixa`) e define a mensagem de boas-vindas.
 - `id_agencia` que não seja número é ignorado.
+- O `produto` indica se o lead é de **cross-sell** (veja [Cliente cross-sell](#cliente-cross-sell)).
+
+## Cliente cross-sell
+
+Um lead é tratado como **cross-sell** quando o `produto` é um dos produtos abaixo. Nesse caso, o lead chega ao atendimento marcado como cross-sell, junto com o produto oferecido. Nos demais produtos, o lead segue o fluxo normal.
+
+Produtos de cross-sell:
+
+- `TAGCAIXA`
+- `CA/CR`
+- `VTCAIXA`
+- `FROTACAIXA`
+- `DESPESACAIXA`
+- `MULTI`
+- `CROSS - CA/CR`
+- `CROSS - VTCAIXA`
+- `CROSS - FROTACAIXA`
+- `CROSS - DESPESACAIXA`
+- `CROSS - MULTI`
+
+- O nome é reconhecido **sem diferenciar maiúsculas, acentos, espaços, hífen e sublinhado**. `Cross-VTCaixa`, `cross vtcaixa` e `CROSS - VTCAIXA` são o mesmo produto.
+- O produto também é reconhecido quando aparece **dentro** de um nome maior (ex.: `Oferta VTCAIXA 2026`).
+- Os nomes `CROSS - ...` têm prioridade: `Cross-VTCaixa` é tratado como `CROSS - VTCAIXA`, não como `VTCAIXA`.
+- Não há campo extra para enviar: basta mandar o `produto` com um desses nomes.
+
+Exemplo de lead cross-sell (só o que muda em relação à requisição abaixo):
+
+```json
+{ "produto": "CROSS - VTCAIXA" }
+```
 
 ## Requisição
 

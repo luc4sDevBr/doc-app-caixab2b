@@ -1,5 +1,10 @@
 # Histórico
 
+## 07/10/2026
+
+- [`addleadfocare`](./post-addleadfocare.html): leads com `produto` de cross-sell (ex.: `CROSS - VTCAIXA`, `TAGCAIXA`) passam a ser identificados como cross-sell no atendimento. Veja [Cliente cross-sell](./post-addleadfocare.html#cliente-cross-sell).
+- [`consultacliente`](./post-consultacliente.html) passa a informar se o cliente tem venda (`possui_venda`, `total_vendas`) e o andamento da venda mais recente: tabulações N1, N2 e N3 com as datas e o `status_venda` (`PROMESSA`, `PRÉ-VENDA` ou `CONCLUÍDO`).
+
 ## 02/10/2026
 
 - Endereço base da API: **`https://focare-techia.actionline.com.br:30454`**. A coleção do Postman já vem com ele preenchido.

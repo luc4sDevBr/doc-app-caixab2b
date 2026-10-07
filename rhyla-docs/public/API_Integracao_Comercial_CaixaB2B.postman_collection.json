@@ -478,7 +478,8 @@
 								"type": "text/javascript",
 								"exec": [
 									"pm.test(\"status 200\", () => pm.response.to.have.status(200));",
-									"pm.test(\"total = 1\", () => pm.expect(pm.response.json().total).to.eql(1));"
+									"pm.test(\"total = 1\", () => pm.expect(pm.response.json().total).to.eql(1));",
+									"pm.test(\"traz a venda (possui_venda, total_vendas, venda)\", () => { const c = pm.response.json().clientes[0]; pm.expect(c).to.have.property(\"possui_venda\"); pm.expect(c).to.have.property(\"total_vendas\"); pm.expect(c).to.have.property(\"venda\"); if (!c.possui_venda) pm.expect(c.venda).to.eql(null); });"
 								]
 							}
 						}
