@@ -11,6 +11,7 @@ Envia um novo lead para a operação. Quando o lead é aceito, a empresa recebe 
 - Se já existe um cliente com o mesmo CPF/CNPJ e o mesmo produto, o lead é registrado, mas o cliente não é duplicado.
 - `canal_lead` identifica a origem do lead (ex.: `form_caixa`) e define a mensagem de boas-vindas.
 - `id_agencia` que não seja número é ignorado.
+- `email` é opcional. Se o cliente já existe (mesmo CPF/CNPJ e produto), o e-mail enviado **substitui** o e-mail que ele tinha. Um e-mail em formato inválido é ignorado, sem recusar o lead.
 - O `produto` indica se o lead é de **cross-sell** (veja [Cliente cross-sell](#cliente-cross-sell)).
 
 ## Cliente cross-sell
@@ -67,7 +68,8 @@ Exemplo de lead cross-sell (só o que muda em relação à requisição abaixo):
   "origem_midia": "instagram",
   "fornecedor_atual": "Não utiliza tag atualmente",
   "necessidade_principal": "Centralizar o controle das despesas da frota",
-  "interesse_demonstrado": "Demonstrou interesse em avançar com a contratação"
+  "interesse_demonstrado": "Demonstrou interesse em avançar com a contratação",
+  "email": "contato@empresaexemplo.com.br"
 }
 ```
 

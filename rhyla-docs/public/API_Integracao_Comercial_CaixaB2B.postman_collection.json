@@ -123,7 +123,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"data_cadastro\": \"{{dataCadastro}}\",\n  \"produto\": \"CARTAO_BENEFICIO\",\n  \"tp_cliente\": \"PJ\",\n  \"qtde_func\": \"50\",\n  \"perfil_mailing\": \"{{cnpjPerfil}}\",\n  \"cpf\": \"{{cpfTeste}}\",\n  \"nome\": \"Empresa Teste Postman LTDA\",\n  \"nome_fantasia\": \"Teste Postman\",\n  \"dt_abertura\": \"2010-05-20\",\n  \"cnae\": \"João da Silva (decisor)\",\n  \"desc_cnae\": \"(11) 97777-6666\",\n  \"sr\": \"Diretor financeiro\",\n  \"sev\": \"Frota própria\",\n  \"agencia\": \"1234\",\n  \"id_agencia\": \"5678\",\n  \"operacao\": \"Planilha manual\",\n  \"telefone\": \"{{telefoneTeste}}\",\n  \"canal_lead\": \"form_caixa\",\n  \"origem_midia\": \"instagram\",\n  \"fornecedor_atual\": \"Não utiliza tag atualmente\",\n  \"necessidade_principal\": \"Centralizar e melhorar o controle das despesas da frota\",\n  \"interesse_demonstrado\": \"Demonstrou interesse em avançar com a contratação\"\n}",
+							"raw": "{\n  \"data_cadastro\": \"{{dataCadastro}}\",\n  \"produto\": \"CARTAO_BENEFICIO\",\n  \"tp_cliente\": \"PJ\",\n  \"qtde_func\": \"50\",\n  \"perfil_mailing\": \"{{cnpjPerfil}}\",\n  \"cpf\": \"{{cpfTeste}}\",\n  \"nome\": \"Empresa Teste Postman LTDA\",\n  \"nome_fantasia\": \"Teste Postman\",\n  \"dt_abertura\": \"2010-05-20\",\n  \"cnae\": \"João da Silva (decisor)\",\n  \"desc_cnae\": \"(11) 97777-6666\",\n  \"sr\": \"Diretor financeiro\",\n  \"sev\": \"Frota própria\",\n  \"agencia\": \"1234\",\n  \"id_agencia\": \"5678\",\n  \"operacao\": \"Planilha manual\",\n  \"telefone\": \"{{telefoneTeste}}\",\n  \"canal_lead\": \"form_caixa\",\n  \"origem_midia\": \"instagram\",\n  \"fornecedor_atual\": \"Não utiliza tag atualmente\",\n  \"necessidade_principal\": \"Centralizar e melhorar o controle das despesas da frota\",\n  \"interesse_demonstrado\": \"Demonstrou interesse em avançar com a contratação\",\n  \"email\": \"contato@empresateste.com.br\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -738,6 +738,107 @@
 							}
 						}
 					]
+				},
+				{
+					"name": "36 consultacliente - pelo telefone (com máscara e 55)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"telefone\": \"+55 {{telefoneTeste}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/consultacliente",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"consultacliente"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+									"pm.test(\"acha pelo menos 1 cliente\", () => pm.expect(pm.response.json().total).to.be.at.least(1));",
+									"pm.test(\"cada cliente traz email\", () => pm.response.json().clientes.forEach(c => pm.expect(c).to.have.property(\"email\")));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "37 consultacliente - telefone inválido",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"telefone\": \"123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/consultacliente",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"consultacliente"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 400\", () => pm.response.to.have.status(400));",
+									"pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
+								]
+							}
+						}
+					]
 				}
 			]
 		},
@@ -1088,6 +1189,106 @@
 								"type": "text/javascript",
 								"exec": [
 									"pm.test(\"status 401\", () => pm.response.to.have.status(401));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "38 atualizacliente - email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"codprospect\": \"{{codprospect}}\",\n  \"email\": \"  Financeiro@EmpresaTeste.com.br \"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/atualizacliente",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"atualizacliente"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+									"pm.test(\"email gravado em minúsculas e sem espaços\", () => pm.expect(pm.response.json().cliente.email).to.eql(\"financeiro@empresateste.com.br\"));"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "39 atualizacliente - email inválido",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"codprospect\": \"{{codprospect}}\",\n  \"email\": \"financeiro@\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/interface/caixab2b/atualizacliente",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"interface",
+								"caixab2b",
+								"atualizacliente"
+							]
+						},
+						"description": ""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status 400\", () => pm.response.to.have.status(400));",
+									"pm.test(\"corpo tem erro = true\", () => pm.expect(pm.response.json().erro).to.eql(true));"
 								]
 							}
 						}
@@ -1518,7 +1719,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"origem\": \"wpp_direct\",\n  \"produto\": \"CARTAO_BENEFICIO\",\n  \"tp_cliente\": \"PJ\",\n  \"qtde_func\": \"50\",\n  \"perfil_mailing\": \"{{cpfDireto}}\",\n  \"cpf\": \"{{cpfDireto}}\",\n  \"nome\": \"Empresa Teste Direto LTDA\",\n  \"nome_fantasia\": \"Teste Direto\",\n  \"dt_abertura\": \"2010-05-20\",\n  \"cnae\": \"João da Silva\",\n  \"desc_cnae\": \"(11) 97777-6666\",\n  \"sr\": \"Diretor financeiro\",\n  \"sev\": \"Frota própria\",\n  \"agencia\": \"1234\",\n  \"id_agencia\": \"5678\",\n  \"operacao\": \"Planilha manual\",\n  \"telefone\": \"{{telefoneTeste}}\",\n  \"origem_midia\": \"whatsapp\",\n  \"fornecedor_atual\": \"Não utiliza tag atualmente\",\n  \"necessidade_principal\": \"Centralizar o controle das despesas da frota\",\n  \"interesse_demonstrado\": \"Demonstrou interesse em avançar com a contratação\"\n}",
+							"raw": "{\n  \"origem\": \"wpp_direct\",\n  \"produto\": \"CARTAO_BENEFICIO\",\n  \"tp_cliente\": \"PJ\",\n  \"qtde_func\": \"50\",\n  \"perfil_mailing\": \"{{cpfDireto}}\",\n  \"cpf\": \"{{cpfDireto}}\",\n  \"nome\": \"Empresa Teste Direto LTDA\",\n  \"nome_fantasia\": \"Teste Direto\",\n  \"dt_abertura\": \"2010-05-20\",\n  \"cnae\": \"João da Silva\",\n  \"desc_cnae\": \"(11) 97777-6666\",\n  \"sr\": \"Diretor financeiro\",\n  \"sev\": \"Frota própria\",\n  \"agencia\": \"1234\",\n  \"id_agencia\": \"5678\",\n  \"operacao\": \"Planilha manual\",\n  \"telefone\": \"{{telefoneTeste}}\",\n  \"origem_midia\": \"whatsapp\",\n  \"fornecedor_atual\": \"Não utiliza tag atualmente\",\n  \"necessidade_principal\": \"Centralizar o controle das despesas da frota\",\n  \"interesse_demonstrado\": \"Demonstrou interesse em avançar com a contratação\",\n  \"email\": \"contato@empresateste.com.br\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"

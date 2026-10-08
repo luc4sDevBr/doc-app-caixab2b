@@ -30,6 +30,7 @@ Os mesmos nomes valem no envio do lead ([addleadfocare](./post-addleadfocare.htm
 | `fornecedor_atual` | Fornecedor atual | texto, 200 | | `Não utiliza tag atualmente` |
 | `necessidade_principal` | Necessidade principal | texto, 500 | | `Centralizar o controle das despesas da frota` |
 | `interesse_demonstrado` | Interesse demonstrado | texto, 500 | | `Demonstrou interesse em avançar` |
+| `email` | E-mail do cliente | e-mail (`nome@dominio.com.br`) | | `contato@empresa.com.br` |
 
 ## Campos com outro significado (★)
 
@@ -49,6 +50,8 @@ Os mesmos nomes valem no envio do lead ([addleadfocare](./post-addleadfocare.htm
 - **Números:** `qtde_func` e `id_agencia` precisam ser números inteiros. No envio do lead, um `id_agencia` inválido é ignorado; na atualização, ele volta erro `400`.
 - **Datas:** `data_cadastro` no formato `yyyy-MM-dd HH:mm:ss` e `dt_abertura` no formato `yyyy-MM-dd`.
 - **Telefones:** `telefone` (da empresa) pode ir com ou sem máscara e é o número que recebe o contato por WhatsApp; na resposta ele volta só com dígitos. `desc_cnae` (do representante) é guardado exatamente como foi enviado.
+- **E-mail:** `email` é guardado sem espaços nas pontas e em minúsculas. No envio de lead e no `addclientedireto`, um e-mail inválido é ignorado e o cliente é gravado normalmente; na atualização, ele volta erro `400`.
 - **Grafia:** `necessidade_principal` também é aceito como `nescessidade_principal`.
 - **Consulta por documento:** o `consultacliente` procura o CPF/CNPJ informado tanto em `cpf` quanto em `perfil_mailing`, sem pontuação.
+- **Consulta por telefone:** o `consultacliente` também procura pelo `telefone`, considerando o número com e sem `55`, com e sem o nono dígito e com ou sem máscara.
 - **Código do cliente:** na consulta, cada cliente também traz o `codprospect`, usado na atualização e na tabulação.

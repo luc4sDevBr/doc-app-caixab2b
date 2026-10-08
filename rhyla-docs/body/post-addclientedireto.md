@@ -24,6 +24,7 @@ Inclui um cliente que **já está conversando** com a operação por um canal di
 - `cpf`, `nome`, `produto` e `telefone` são obrigatórios. Datas e números seguem o formato de [Campos do cliente](./campos_do_cliente.html).
 - `data_cadastro` é opcional. Sem ela, vale a data e a hora da chamada.
 - `canal_lead` não é usado neste endpoint: o canal do cliente é a `origem`.
+- `email` é opcional e é gravado no cliente incluído. Se o cliente já existe, o e-mail dele não é alterado: use o [atualizacliente](./post-atualizacliente.html). Um e-mail em formato inválido é ignorado.
 - Texto maior que o tamanho máximo do campo é cortado no limite. O cliente não é recusado por isso.
 - Se já existe um cliente com o mesmo CPF/CNPJ e o mesmo produto, nada é incluído: a resposta é `200` com `jaExistia: true` e o `codprospect` do cliente. Nesse caso, consulte o cliente em [consultacliente](./post-consultacliente.html) e, se faltar alguma informação, complete com [atualizacliente](./post-atualizacliente.html).
 
@@ -52,7 +53,8 @@ Inclui um cliente que **já está conversando** com a operação por um canal di
   "origem_midia": "whatsapp",
   "fornecedor_atual": "Não utiliza tag atualmente",
   "necessidade_principal": "Centralizar o controle das despesas da frota",
-  "interesse_demonstrado": "Demonstrou interesse em avançar com a contratação"
+  "interesse_demonstrado": "Demonstrou interesse em avançar com a contratação",
+  "email": "contato@empresaexemplo.com.br"
 }
 ```
 

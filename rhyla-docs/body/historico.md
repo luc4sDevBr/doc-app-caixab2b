@@ -1,5 +1,10 @@
 # Histórico
 
+## 08/10/2026
+
+- Novo campo opcional `email` (e-mail do cliente) no [`addleadfocare`](./post-addleadfocare.html), no [`addclientedireto`](./post-addclientedireto.html) e no [`atualizacliente`](./post-atualizacliente.html). O [`consultacliente`](./post-consultacliente.html) passa a devolvê-lo.
+- [`consultacliente`](./post-consultacliente.html) aceita a busca por `telefone`, considerando o número com e sem `55`, com e sem o nono dígito e com ou sem máscara.
+
 ## 07/10/2026
 
 - [`addleadfocare`](./post-addleadfocare.html): leads com `produto` de cross-sell (ex.: `CROSS - VTCAIXA`, `TAGCAIXA`) passam a ser identificados como cross-sell no atendimento. Veja [Cliente cross-sell](./post-addleadfocare.html#cliente-cross-sell).

@@ -8,6 +8,7 @@ Atualiza os dados de um cliente. Envie o `codprospect` e só os campos que quer 
 
 - Só muda o que vier **preenchido** e **diferente** do valor atual.
 - Os formatos são os mesmos do envio de lead ([Campos do cliente](./campos_do_cliente.html)). `id_agencia` que não seja número volta `400`.
+- `email` atualiza o e-mail do cliente. E-mail em formato inválido volta `400`.
 - Texto maior que o tamanho máximo do campo é cortado no limite.
 - Não é possível trocar o CPF/CNPJ e o produto para os de outro cliente: volta `409`.
 - Se nada mudou, a resposta é `200` com `camposAtualizados` vazio.
@@ -20,6 +21,7 @@ Atualiza os dados de um cliente. Envie o `codprospect` e só os campos que quer 
   "qtde_func": "75",
   "telefone": "(11) 97777-6666",
   "fornecedor_atual": "Concorrente X",
+  "email": "financeiro@empresaexemplo.com.br",
   "nome": "",
   "agencia": ""
 }
@@ -34,8 +36,8 @@ Atualiza os dados de um cliente. Envie o `codprospect` e só os campos que quer 
   "idRequest": 1003,
   "sucess": "Cliente atualizado",
   "codprospect": 1523,
-  "camposAtualizados": ["qtde_func", "telefone", "fornecedor_atual"],
-  "cliente": { "codprospect": 1523, "qtde_func": "75", "telefone": "11977776666" }
+  "camposAtualizados": ["qtde_func", "telefone", "fornecedor_atual", "email"],
+  "cliente": { "codprospect": 1523, "qtde_func": "75", "telefone": "11977776666", "email": "financeiro@empresaexemplo.com.br" }
 }
 ```
 

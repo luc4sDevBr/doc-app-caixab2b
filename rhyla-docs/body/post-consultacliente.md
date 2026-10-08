@@ -2,17 +2,20 @@
 
 **POST** `/api/interface/caixab2b/consultacliente` · Bearer
 
-Consulta clientes por `codprospect`, `cpf` ou `cnpj`. Informe pelo menos um. Se enviar mais de um, o cliente precisa atender a todos.
+Consulta clientes por `codprospect`, `cpf`, `cnpj` ou `telefone`. Informe pelo menos um. Se enviar mais de um, o cliente precisa atender a todos.
 
 | Campo | Tipo | Descrição |
 |---|---|---|
 | `codprospect` | número | Código do cliente |
 | `cpf` | texto | CPF ou CNPJ, com ou sem pontuação |
 | `cnpj` | texto | Mesma busca do `cpf`. Se os dois vierem, precisam ser iguais. |
+| `telefone` | texto | Telefone do cliente: DDD + número, com ou sem `55`, com ou sem máscara |
 
 ## Regras
 
 - O documento pode ir com ou sem pontuação (`.`, `-`, `/`).
+- O `telefone` é procurado em todas as formas do mesmo número: com e sem `55`, com e sem o nono dígito, e com ou sem máscara. Exemplo: `(86) 99466-8782`, `5586994668782` e `8694668782` encontram os mesmos clientes. O nono dígito só é considerado para celular.
+- O mesmo telefone pode estar em vários cadastros: a resposta traz todos (até 50).
 - A resposta é uma **lista**, porque o mesmo documento pode ter um cliente por produto. São até 50 clientes, do mais recente para o mais antigo.
 - Cada cliente traz também se ele **tem venda** e, se tiver, o andamento da venda mais recente (veja [Venda do cliente](#venda-do-cliente)).
 
@@ -20,6 +23,12 @@ Consulta clientes por `codprospect`, `cpf` ou `cnpj`. Informe pelo menos um. Se 
 
 ```json
 { "cnpj": "12.345.678/0001-90" }
+```
+
+Pelo telefone:
+
+```json
+{ "telefone": "(11) 99999-8888" }
 ```
 
 ## Resposta 200
@@ -47,6 +56,7 @@ Consulta clientes por `codprospect`, `cpf` ou `cnpj`. Informe pelo menos um. Se 
       "fornecedor_atual": "Não utiliza tag atualmente",
       "necessidade_principal": "Centralizar o controle das despesas da frota",
       "interesse_demonstrado": "Demonstrou interesse em avançar com a contratação",
+      "email": "contato@empresaexemplo.com.br",
       "possui_venda": true,
       "total_vendas": 1,
       "venda": {
@@ -95,6 +105,6 @@ Cliente sem venda:
 
 | HTTP | Quando |
 |---|---|
-| `400` | Nenhum filtro, `codprospect` não numérico, ou `cpf` diferente de `cnpj` |
+| `400` | Nenhum filtro, `codprospect` não numérico, `cpf` diferente de `cnpj`, ou `telefone` sem DDD + número (10 ou 11 dígitos) |
 | `401` | Token ausente, inválido ou expirado |
 | `404` | Nenhum cliente encontrado |
